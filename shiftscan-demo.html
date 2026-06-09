@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ShiftScan — Demo</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#F7F7F6;--surf:#FFFFFF;--bord:#E4E4E0;--tx:#1A1A18;--mu:#6B6B68;--ac:#2563EB;--acl:#EFF6FF;--acd:#1D4ED8;--gr:#16A34A;--grl:#F0FDF4;--am:#D97706;--aml:#FFFBEB;--re:#DC2626;--rel:#FEF2F2;--pu:#534AB7;--pul:#EEEDFE;--rad:12px;--rads:8px;--radl:16px}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5}
+    .scr{display:none}
+    .scr.on{display:block;animation:fi 0.14s ease}
+    @keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+    
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:var(--surf);border-bottom:0.5px solid var(--bord);flex-wrap:wrap;gap:8px}
+    .logo{font-size:15px;font-weight:500;display:flex;align-items:center;gap:7px}
+    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--ac);flex-shrink:0}
+    .tabs{display:flex;gap:2px;flex-wrap:wrap}
+    .tab{padding:6px 11px;border-radius:var(--rads);font-size:13px;color:var(--mu);cursor:pointer;border:none;background:none;transition:all 0.12s;white-space:nowrap}
+    .tab:hover{background:var(--bg);color:var(--tx)}
+    .tab.on{background:var(--acl);color:var(--ac);font-weight:500}
+    
+    .shell{width:340px;margin:24px auto;background:var(--surf);border-radius:24px;border:0.5px solid var(--bord);overflow:hidden}
+    .sh-head{padding:16px 20px 13px;border-bottom:0.5px solid var(--bord)}
+    .sh-body{padding:20px;min-height:480px}
+    
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+    .bg{background:var(--grl);color:var(--gr)}
+    .ba{background:var(--aml);color:var(--am)}
+    .br{background:var(--rel);color:var(--re)}
+    .bb{background:var(--acl);color:var(--ac)}
+    .bx{background:var(--bg);color:var(--mu)}
+    .dot6{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+    
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:var(--rad);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.12s;white-space:nowrap}
+    .btn:active{transform:scale(0.97)}
+    .bpri{background:var(--ac);color:#fff}
+    .bpri:hover{background:var(--acd)}
+    .bsec{background:var(--bg);color:var(--tx);border:0.5px solid var(--bord)}
+    .bsuc{background:var(--grl);color:var(--gr)}
+    .bful{width:100%;padding:13px;font-size:14px}
+    .blg{border-radius:13px}
+    
+    input,select{width:100%;padding:9px 12px;border-radius:var(--rads);border:0.5px solid var(--bord);background:var(--surf);color:var(--tx);font-size:13px;outline:none;transition:border-color 0.12s}
+    input:focus,select:focus{border-color:var(--ac)}
+    
+    .card{background:var(--surf);border-radius:var(--radl);border:0.5px solid var(--bord);padding:18px}
+    .mc{background:var(--bg);border-radius:var(--rads);padding:13px;border:0.5px solid var(--bord)}
+    .ml{font-size:12px;color:var(--mu);margin-bottom:3px}
+    .mv{font-size:21px;font-weight:500}
+    .ms{font-size:11px;color:var(--mu);margin-top:2px}
+    
+    .stk{display:flex;flex-direction:column;gap:10px}
+    .fb{display:flex;align-items:center;justify-content:space-between}
+    .fg{display:flex;align-items:center;gap:8px}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .sec{font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:12px}
+    .mu{color:var(--mu)}
+    .sm{font-size:13px}
+    .w5{font-weight:500}
+    .scy{overflow-y:auto;max-height:280px}
+    
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{text-align:left;padding:8px 12px;color:var(--mu);font-weight:500;border-bottom:0.5px solid var(--bord);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:0.04em}
+    td{padding:9px 12px;border-bottom:0.5px solid var(--bord);color:var(--tx)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--bg)}
+    
+    .tog{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--bord)}
+    .tog:last-child{border-bottom:none}
+    .sw{width:40px;height:21px;background:var(--bord);border-radius:11px;cursor:pointer;position:relative;transition:background 0.16s;flex-shrink:0}
+    .sw.on{background:var(--ac)}
+    .sw::after{content:'';width:15px;height:15px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform 0.16s}
+    .sw.on::after{transform:translateX(19px)}
+    
+    .av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+    
+    .pd{display:flex;gap:10px;justify-content:center;margin:16px 0}
+    .pd-d{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--bord);transition:all 0.12s}
+    .pd-d.f{background:var(--ac);border-color:var(--ac)}
+    .pp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .pk{padding:15px;text-align:center;border-radius:var(--rad);background:var(--bg);border:0.5px solid var(--bord);font-size:17px;font-weight:500;cursor:pointer;transition:all 0.12s;color:var(--tx);line-height:1}
+    .pk:hover{background:var(--acl);border-color:var(--ac);color:var(--ac)}
+    .pk:active{transform:scale(0.93)}
+    
+    .sring{width:68px;height:68px;border-radius:50%;background:var(--grl);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .sico{font-size:32px;color:var(--gr)}
+    
+    .alert-bar{background:var(--aml);border:0.5px solid var(--am);border-radius:var(--rads);padding:10px 13px;font-size:12px;color:var(--am);display:flex;align-items:center;gap:8px;margin-bottom:14px}
+    .info-bar{background:var(--acl);border:0.5px solid var(--ac);border-radius:var(--rads);padding:10px 13px;font-size:12px;color:var(--ac);display:flex;align-items:center;gap:8px;margin-bottom:14px}
+    
+    @media(max-width:600px){
+      .shell{width:100%;border-radius:0;margin:0}
+      .nav{padding:10px}
+      .logo{font-size:14px}
+      .tabs{font-size:12px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="logo"><div class="logo-dot"></div>ShiftScan<span style="font-size:12px;color:var(--mu);font-weight:400;margin-left:6px">Demo</span></div>
+  <div class="tabs" id="tabs">
+    <button class="tab on" onclick="go(0)">Clock-in</button>
+    <button class="tab" onclick="go(1)">Success</button>
+    <button class="tab" onclick="go(2)">Dashboard</button>
+    <button class="tab" onclick="go(3)">Timesheet</button>
+    <button class="tab" onclick="go(4)">QR security</button>
+    <button class="tab" onclick="go(5)">Admin</button>
+  </div>
+</div>
+
+<!-- SCREEN 0: CLOCK-IN -->
+<div class="scr on" id="s0">
+  <div class="shell">
+    <div class="sh-head">
+      <div class="fb">
+        <div>
+          <div style="font-size:17px;font-weight:500">The Kings Arms</div>
+          <div style="font-size:12px;color:var(--mu);margin-top:2px" id="clk"></div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge bg" style="font-size:10px"><span class="dot6"></span>Venue active</span>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px">Wandsworth</div>
+        </div>
+      </div>
+    </div>
+    <div class="sh-body">
+      <div style="margin-bottom:18px">
+        <div style="font-size:15px;font-weight:500;margin-bottom:3px">Enter your PIN</div>
+        <div style="font-size:12px;color:var(--mu)">Same as your till PIN</div>
+      </div>
+      <div class="pd" id="pindots">
+        <div class="pd-d" id="d0"></div><div class="pd-d" id="d1"></div>
+        <div class="pd-d" id="d2"></div><div class="pd-d" id="d3"></div>
+      </div>
+      <div class="pp">
+        <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
+        <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
+        <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
+        <div></div><div class="pk" onclick="pk('0')">0</div>
+        <div class="pk" style="font-size:13px" onclick="pdel()">⌫</div>
+      </div>
+      <div id="pinhint" style="text-align:center;font-size:11px;color:var(--mu);margin-top:10px">Try: 1234 · 5678 · 9012</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 1: SUCCESS -->
+<div class="scr" id="s1">
+  <div class="shell">
+    <div class="sh-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 22px;text-align:center">
+      <div class="sring"><span class="sico">✓</span></div>
+      <div style="font-size:20px;font-weight:500;margin-bottom:6px" id="stitle">Clocked in</div>
+      <div style="font-size:14px;color:var(--mu);margin-bottom:4px" id="sname">James Cole</div>
+      <div style="font-size:26px;font-weight:500;color:var(--ac);margin:14px 0" id="stime">17:58</div>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:26px" id="sdate">Tuesday, 9 June 2026</div>
+      <div style="background:var(--bg);border-radius:var(--rads);border:0.5px solid var(--bord);padding:14px;width:100%;margin-bottom:20px">
+        <div class="fb sm"><span class="mu">Venue</span><span class="w5">The Kings Arms</span></div>
+        <div class="fb sm" style="margin-top:7px"><span class="mu">Action</span><span class="w5" id="sact">Clock in</span></div>
+        <div class="fb sm" style="margin-top:7px"><span class="mu">Location</span><span style="color:var(--gr);font-weight:500">✓ Verified</span></div>
+      </div>
+      <button class="btn bsec sm" onclick="go(0)">← Back to clock-in</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: DASHBOARD -->
+<div class="scr" id="s2">
+  <div style="max-width:860px;margin:0 auto;padding:20px 16px">
+    <div style="font-size:20px;font-weight:500;margin-bottom:4px">Today's overview</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">The Kings Arms · Tuesday 9 June 2026</div>
+    <div class="g4" style="margin-bottom:20px">
+      <div class="mc"><div class="ml">Clocked in</div><div class="mv" style="color:var(--gr)">4</div><div class="ms">Active now</div></div>
+      <div class="mc"><div class="ml">On break</div><div class="mv" style="color:var(--am)">1</div><div class="ms">Back 18:15</div></div>
+      <div class="mc"><div class="ml">Clocked out</div><div class="mv">2</div><div class="ms">Finished</div></div>
+      <div class="mc"><div class="ml">Late arrivals</div><div class="mv" style="color:var(--re)">1</div><div class="ms">&gt;15 min</div></div>
+    </div>
+    <div class="card">
+      <div class="sec">Team status</div>
+      <div class="stk" style="gap:7px">
+        <div class="fb" style="padding:9px 11px;background:var(--bg);border-radius:var(--rads)">
+          <div class="fg"><div class="av" style="width:30px;height:30px;background:#EFF6FF;color:#2563EB">JC</div><div><div class="w5 sm">James Cole</div><div style="font-size:11px;color:var(--mu)">Bartender · 17:00</div></div></div>
+          <span class="badge bg" style="font-size:10px"><span class="dot6"></span>In</span>
+        </div>
+        <div class="fb" style="padding:9px 11px;background:var(--bg);border-radius:var(--rads)">
+          <div class="fg"><div class="av" style="width:30px;height:30px;background:#F0FDF4;color:#16A34A">SR</div><div><div class="w5 sm">Sofia Rodriguez</div><div style="font-size:11px;color:var(--mu)">Floor Mgr · 16:00</div></div></div>
+          <span class="badge bg" style="font-size:10px"><span class="dot6"></span>In</span>
+        </div>
+        <div class="fb" style="padding:9px 11px;background:var(--aml);border-radius:var(--rads);border:0.5px solid rgba(217,119,6,0.2)">
+          <div class="fg"><div class="av" style="width:30px;height:30px;background:#FFFBEB;color:#D97706">MO</div><div><div class="w5 sm">Marcus O'Brien</div><div style="font-size:11px;color:var(--am)">On break · 17:45</div></div></div>
+          <span class="badge ba" style="font-size:10px"><span class="dot6"></span>Break</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: TIMESHEET -->
+<div class="scr" id="s3">
+  <div style="max-width:860px;margin:0 auto;padding:20px 16px">
+    <div style="font-size:20px;font-weight:500;margin-bottom:4px">Weekly timesheet</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Week of 2–8 June 2026</div>
+    <div class="g4" style="margin-bottom:20px">
+      <div class="mc"><div class="ml">Total hours</div><div class="mv">142.5</div><div class="ms">This week</div></div>
+      <div class="mc"><div class="ml">Break time</div><div class="mv">11.0</div><div class="ms">hrs deducted</div></div>
+      <div class="mc"><div class="ml">Shifts</div><div class="mv">28</div><div class="ms">5 staff</div></div>
+      <div class="mc"><div class="ml" style="color:var(--am)">Overtime</div><div class="mv" style="color:var(--am)">6.5</div><div class="ms">hrs flagged</div></div>
+    </div>
+    <div class="card">
+      <div class="sec">Employee hours</div>
+      <table>
+        <thead><tr><th>Employee</th><th>Hours</th><th>Break</th><th>Shifts</th></tr></thead>
+        <tbody>
+          <tr><td><div class="fg"><div class="av" style="width:24px;height:24px;background:#EFF6FF;color:#2563EB">JC</div><span class="w5">James Cole</span></div></td><td>38.5h</td><td>2.5h</td><td>5</td></tr>
+          <tr><td><div class="fg"><div class="av" style="width:24px;height:24px;background:#F0FDF4;color:#16A34A">SR</div><span class="w5">Sofia R.</span></div></td><td>32.0h</td><td>2.0h</td><td>4</td></tr>
+          <tr><td><div class="fg"><div class="av" style="width:24px;height:24px;background:#FFFBEB;color:#D97706">MO</div><span class="w5">Marcus O.</span></div></td><td>29.0h</td><td>3.0h</td><td>6</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;padding:12px;background:var(--acl);border-radius:var(--rads);border:0.5px solid var(--ac);font-size:11px;color:var(--ac)">
+        <strong>HMRC RTI export ready</strong> — Compatible with Xero, Sage, BrightPay. Download CSV below. No payroll integration needed — manual upload to your provider.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: QR SECURITY -->
+<div class="scr" id="s4">
+  <div style="max-width:860px;margin:0 auto;padding:20px 16px">
+    <div style="font-size:20px;font-weight:500;margin-bottom:4px">QR &amp; security</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">The Kings Arms, Wandsworth</div>
+    <div class="g2" style="gap:14px">
+      <div class="card">
+        <div class="sec">Active QR code</div>
+        <div style="text-align:center;margin:12px 0">
+          <div style="background:var(--tx);border-radius:var(--radl);padding:16px;display:inline-flex;flex-direction:column;align-items:center;gap:9px">
+            <div style="color:#fff;font-size:11px;font-weight:500">The Kings Arms</div>
+            <svg width="100" height="100" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+              <rect width="110" height="110" fill="white"/>
+              <g fill="#1A1A18">
+                <rect x="7" y="7" width="36" height="36" rx="3"/><rect x="11" y="11" width="28" height="28" fill="white" rx="2"/><rect x="15" y="15" width="20" height="20" rx="1"/>
+                <rect x="67" y="7" width="36" height="36" rx="3"/><rect x="71" y="11" width="28" height="28" fill="white" rx="2"/><rect x="75" y="15" width="20" height="20" rx="1"/>
+                <rect x="7" y="67" width="36" height="36" rx="3"/><rect x="11" y="71" width="28" height="28" fill="white" rx="2"/><rect x="15" y="75" width="20" height="20" rx="1"/>
+                <rect x="67" y="67" width="7" height="7"/><rect x="78" y="67" width="7" height="7"/><rect x="89" y="67" width="7" height="7"/><rect x="100" y="67" width="7" height="7"/>
+                <rect x="67" y="78" width="7" height="7"/><rect x="89" y="78" width="7" height="7"/>
+                <rect x="67" y="89" width="7" height="7"/><rect x="78" y="89" width="7" height="7"/><rect x="89" y="89" width="7" height="7"/>
+              </g>
+              <rect x="42" y="42" width="26" height="26" rx="3" fill="#2563EB"/>
+              <text x="55" y="60" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="sans-serif">SS</text>
+            </svg>
+            <div style="color:rgba(255,255,255,0.6);font-size:10px">Rotates daily · 24:00 remaining</div>
+          </div>
+        </div>
+        <div class="fb sm" style="margin-top:8px"><span class="mu">Status</span><span style="color:var(--gr);font-weight:500">✓ Active</span></div>
+        <div class="fb sm" style="margin-top:5px"><span class="mu">Scans today</span><span style="font-weight:500;color:var(--ac)">17</span></div>
+      </div>
+      <div class="card">
+        <div class="sec">Security controls</div>
+        <div class="tog"><div><div class="w5 sm">Daily QR rotation</div><div style="font-size:11px;color:var(--mu)">Auto-rotates every 24h</div></div><div class="sw on"></div></div>
+        <div class="tog"><div><div class="w5 sm">GPS geofencing</div><div style="font-size:11px;color:var(--mu)">Block if &gt;50m from venue</div></div><div class="sw on"></div></div>
+        <div class="tog"><div><div class="w5 sm">PIN required</div><div style="font-size:11px;color:var(--mu)">No staff list, PIN only</div></div><div class="sw on"></div></div>
+        <div class="tog"><div><div class="w5 sm">Duplicate block</div><div style="font-size:11px;color:var(--mu)">Can't clock in twice</div></div><div class="sw on"></div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="sec">Why this works</div>
+      <div style="font-size:12px;line-height:1.6;color:var(--mu)">
+        <div style="margin-bottom:8px"><strong style="color:var(--tx)">PIN:</strong> Staff use same PIN as their till. No app, no scrolling list. Instant.</div>
+        <div style="margin-bottom:8px"><strong style="color:var(--tx)">QR rotation:</strong> Changes every 24h. Even if someone screenshots it, it's only valid for a day.</div>
+        <div style="margin-bottom:8px"><strong style="color:var(--tx)">Geofencing:</strong> GPS verifies they're actually at the venue, not clocking in from home or another bar.</div>
+        <div><strong style="color:var(--tx)">Audit trail:</strong> Every scan is logged with location, time, IP. Impossible to fake.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: ADMIN -->
+<div class="scr" id="s5">
+  <div style="max-width:860px;margin:0 auto;padding:20px 16px">
+    <div class="fb" style="margin-bottom:18px">
+      <div style="font-size:20px;font-weight:500">Admin panel</div>
+      <span class="badge bb" style="font-size:11px">🔒 Manager only</span>
+    </div>
+
+    <div class="alert-bar"><strong>2 staff pending approval</strong> — must approve before they can clock in</div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="sec">Pending approvals</div>
+      <div class="stk" style="gap:8px">
+        <div class="fb" style="padding:11px 12px;background:var(--aml);border-radius:var(--rads);border:0.5px solid rgba(217,119,6,0.2)">
+          <div><div class="w5 sm">Priya Barker</div><div style="font-size:10px;color:var(--am)">Waiter · registered 2 hrs ago</div></div>
+          <button class="btn bpri" style="padding:4px 10px;font-size:11px">Approve</button>
+        </div>
+        <div class="fb" style="padding:11px 12px;background:var(--aml);border-radius:var(--rads);border:0.5px solid rgba(217,119,6,0.2)">
+          <div><div class="w5 sm">Owen Turner</div><div style="font-size:10px;color:var(--am)">Bar Back · registered 4 hrs ago</div></div>
+          <button class="btn bpri" style="padding:4px 10px;font-size:11px">Approve</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="sec">Active staff (5)</div>
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><div class="fg"><div class="av" style="width:22px;height:22px;background:#EFF6FF;color:#2563EB">JC</div>James Cole</div></td><td class="mu">Bartender</td><td><span class="badge bg" style="font-size:10px">✓</span></td></tr>
+          <tr><td><div class="fg"><div class="av" style="width:22px;height:22px;background:#F0FDF4;color:#16A34A">SR</div>Sofia R.</div></td><td class="mu">Floor Mgr</td><td><span class="badge bg" style="font-size:10px">✓</span></td></tr>
+          <tr><td><div class="fg"><div class="av" style="width:22px;height:22px;background:#FFFBEB;color:#D97706">MO</div>Marcus O.</div></td><td class="mu">Waiter</td><td><span class="badge bg" style="font-size:10px">✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="sec">Key features</div>
+      <div style="font-size:12px;line-height:1.8;color:var(--mu)">
+        <div style="margin-bottom:10px">✓ <strong style="color:var(--tx)">PIN authentication:</strong> Bcrypt hashed, never stored plain</div>
+        <div style="margin-bottom:10px">✓ <strong style="color:var(--tx)">Admin approval:</strong> Staff must be approved before clocking in</div>
+        <div style="margin-bottom:10px">✓ <strong style="color:var(--tx)">Real-time dashboard:</strong> See who's in/out/on break instantly</div>
+        <div style="margin-bottom:10px">✓ <strong style="color:var(--tx)">Append-only log:</strong> No edits, no deletes. Immutable audit trail.</div>
+        <div style="margin-bottom:10px">✓ <strong style="color:var(--tx)">HMRC RTI export:</strong> Download CSV compatible with Xero, Sage, BrightPay</div>
+        <div>✓ <strong style="color:var(--tx)">Local network:</strong> All data stays on your machine. No cloud, no monthly fee.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let cur = 0, pin = '';
+  
+  function go(n) {
+    document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+    document.getElementById('s' + n).classList.add('on');
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('on', i === n));
+    cur = n;
+  }
+  
+  function pk(k) {
+    if (pin.length >= 4) return;
+    pin += k;
+    updDots();
+    if (pin.length === 4) {
+      setTimeout(() => {
+        const pins = { '1234': 'James Cole', '5678': 'Sofia Rodriguez', '9012': 'Marcus O\'Brien' };
+        if (pins[pin]) {
+          document.getElementById('stitle').textContent = 'Clocked in';
+          document.getElementById('sname').textContent = pins[pin];
+          document.getElementById('stime').textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          document.getElementById('sdate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          document.getElementById('sact').textContent = 'Clock in';
+          go(1);
+        } else {
+          document.getElementById('pinhint').textContent = 'Incorrect PIN';
+          document.getElementById('pinhint').style.color = '#DC2626';
+          pin = '';
+          updDots();
+          setTimeout(() => { document.getElementById('pinhint').textContent = 'Try: 1234 · 5678 · 9012'; document.getElementById('pinhint').style.color = '#6B6B68'; }, 1500);
+        }
+      }, 180);
+    }
+  }
+  
+  function pdel() {
+    if (pin.length > 0) {
+      pin = pin.slice(0, -1);
+      updDots();
+    }
+  }
+  
+  function updDots() {
+    for (let i = 0; i < 4; i++) {
+      const d = document.getElementById('d' + i);
+      if (d) d.classList.toggle('f', i < pin.length);
+    }
+  }
+  
+  function tickClock() {
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const d = now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    const el = document.getElementById('clk');
+    if (el) el.textContent = d + ' · ' + t;
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+</script>
+
+</body>
+</html>
